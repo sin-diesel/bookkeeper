@@ -33,9 +33,9 @@ jobs:
         poetry install
     - name: Check formatting
       run: |
-        poetry run black --line-length 80
+        poetry run black --line-length 80 $PROJECT_NAME
         git diff --exit-code
-        if [[ "$?"" -eq "1" ]]; then
+        if [[ "$?" -eq "1" ]]; then
           echo "Looks like your code is not formatted."
         fi
     - name: Lint with pylint
