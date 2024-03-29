@@ -21,6 +21,8 @@ jobs:
     steps:
     - name: Install Poetry
       uses: snok/install-poetry@v1
+      run: |
+        poetry install
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
