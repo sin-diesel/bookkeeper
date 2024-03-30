@@ -1,5 +1,5 @@
 """
-Модуль описывает репозиторий, работающий с базой данных SQLite. 
+Модуль описывает репозиторий, работающий с базой данных SQLite.
 """
 
 import sqlite3
@@ -19,9 +19,9 @@ class SqliteRepository(AbstractRepository[T]):
         self._fields.pop("pk")
 
     def add(self, obj: T) -> int:
-        names = ", ".join(self.fields.keys())
-        p = ", ".join("?" * len(self.fields))
-        values = [getattr(obj, x) for x in self.fields]
+        names = ", ".join(self._fields.keys())
+        p = ", ".join("?" * len(self._fields))
+        values = [getattr(obj, x) for x in self._fields]
 
         with sqlite3.connect(self._db_file) as con:
             cur = con.cursor()
@@ -29,7 +29,7 @@ class SqliteRepository(AbstractRepository[T]):
             cur.execute(
                 f"INSERT INTO {self._table_name} ({names} VALUES ({p}))", values
             )
-            obj.pk = cur.lastrowid
+            obj.pk = cur.lastrowid  # type: ignore
         con.close()
 
         return obj.pk
