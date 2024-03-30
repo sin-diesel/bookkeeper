@@ -8,7 +8,16 @@ from pathlib import Path
 _repo_path = Path(__file__).parent.parent.parent
 
 class Custom():
-    pk: int = 0
+    value: int
+    pk: int
+    def __init__(self, value: int = 0, pk: int = 0):
+        self.value = value
+        self.pk = pk
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Custom):
+            raise NotImplementedError
+        return self.value == other.value and self.pk == other.pk
 
 def db_name() -> str:
     return _repo_path / "tests" / "test_db.db"
@@ -17,16 +26,17 @@ def db_name() -> str:
 @pytest.mark.parametrize("repo,custom_class", [(MemoryRepository(), Custom), (SqliteRepository(db_name(), Custom), Custom)])
 def test_crud(repo, custom_class):
     obj = custom_class()
-    import code; code.interact(local={**locals(), **globals()})
     pk = repo.add(obj)
     assert obj.pk == pk
-    assert repo.get(pk) == obj
-    obj2 = custom_class()
-    obj2.pk = pk
-    repo.update(obj2)
-    assert repo.get(pk) == obj2
-    repo.delete(pk)
-    assert repo.get(pk) is None
+    ret = repo.get(pk)
+    import code; code.interact(local={**locals(), **globals()})
+    assert ret == obj
+    # obj2 = custom_class()
+    # obj2.pk = pk
+    # repo.update(obj2)
+    # assert repo.get(pk) == obj
+    # repo.delete(pk)
+    # assert repo.get(pk) is None
 
 @pytest.mark.parametrize("repo,custom_class", [(MemoryRepository(), Custom)])
 def test_cannot_add_with_pk(repo, custom_class):

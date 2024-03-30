@@ -3,11 +3,16 @@
 """
 
 import sqlite3
-from inspect import getmembers
-from inspect import isroutine
+import logging
+from inspect import get_annotations
 from typing import Any
+from pathlib import Path
 
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
+
+
+_logger = logging.getLogger(__file__)
+_logger.setLevel(logging.INFO)
 
 
 class SqliteRepository(AbstractRepository[T]):
@@ -19,49 +24,60 @@ class SqliteRepository(AbstractRepository[T]):
         self._db_file = db_file
         self._cls = cls
         self._table_name = cls.__name__.lower()
-        attrs = getmembers(cls, lambda a: not(isroutine(a)))
-        self._fields = [a[0] for a in attrs if not(a[0].startswith('__') and a[0].endswith('__'))]
-        self._fields.remove("pk")
-
-
-    def add(self, obj: T) -> int | None:
-        if not isinstance(obj, self._cls):
-            raise ValueError(f"Passing object of type {obj.__class__} instead of {self._cls}")
+        self._fields = get_annotations(cls)
+        self._fields.pop("pk")
 
         names = ", ".join(self._fields)
-        p = ", ".join("?" * len(self._fields))
-        values = [getattr(obj, x) for x in self._fields]
+        if not Path.exists(Path(self._db_file)):
+            _logger.info(
+                f"Database not detected at {self._db_file}. A new one will be created."
+            )
+            with sqlite3.connect(self._db_file) as con:
+                cur = con.cursor()
+                cur.execute(f"CREATE TABLE {self._table_name}({names})")
+        else:
+            _logger.info(f"Database at {self._db_file} already exists.")
 
-        if len(values) == 0:
-            return None
+    def add(self, obj: T) -> int:
+        if not isinstance(obj, self._cls):
+            raise ValueError(
+                f"Passing object of type {obj.__class__} instead of {self._cls}"
+            )
+
+        fields = ", ".join("?" * len(self._fields.keys()))
+        values = [getattr(obj, x) for x in self._fields]
 
         with sqlite3.connect(self._db_file) as con:
             cur = con.cursor()
             cur.execute("PRAGMA foreign_keys = ON")
             cur.execute(
-                f"INSERT INTO {self._table_name} ({names} VALUES ({p}))", values
+                f"INSERT INTO {self._table_name} VALUES ({fields})", values
             )
             obj.pk = cur.lastrowid  # type: ignore
         con.close()
 
-        return obj.pk
+        return obj.pk  # type: ignore
 
     def get(self, pk: int) -> T | None:
         with sqlite3.connect(self._db_file) as con:
             cur = con.cursor()
-            cur.execute(
-                f"SELECT * FROM {self._table_name}" f"WHERE row_number() = {pk}"
-            )
-            data = cur.fetchall()
+            cur.execute(f"SELECT * FROM {self._table_name} WHERE rowid = {pk}")
+            data = cur.fetchone()
         con.close()
-        obj = None
-        return obj
+        obj = self._cls(*data, pk)
+        return obj  # type: ignore
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
-        pass
+        return []
 
     def update(self, obj: T) -> None:
         pass
+        # fields_stringified = ", ".join(
+        #     [f"{field}={getattr(obj, field)}" for field in self._fields]
+        # )
+        # with sqlite3.connect(self._db_file) as con:
+        #     cur = con.cursor()
+        #     cur.execute(f"UPDATE {self._table_name} SET")
 
     def delete(self, pk: int) -> None:
         pass
