@@ -79,7 +79,10 @@ class SqliteRepository(AbstractRepository[T]):
         )
         with sqlite3.connect(self._db_file) as con:
             cur = con.cursor()
-            cur.execute(f"UPDATE {self._table_name} SET {fields_stringified} WHERE rowid = {obj.pk}")
+            cur.execute(
+                f"UPDATE {self._table_name} SET {fields_stringified} "
+                f"WHERE rowid = {obj.pk}"
+            )
         con.close()
 
     def delete(self, pk: int) -> None:
