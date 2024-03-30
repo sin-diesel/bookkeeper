@@ -29,14 +29,13 @@ def test_crud(repo, custom_class):
     pk = repo.add(obj)
     assert obj.pk == pk
     ret = repo.get(pk)
-    import code; code.interact(local={**locals(), **globals()})
     assert ret == obj
-    # obj2 = custom_class()
-    # obj2.pk = pk
-    # repo.update(obj2)
-    # assert repo.get(pk) == obj
-    # repo.delete(pk)
-    # assert repo.get(pk) is None
+    obj2 = custom_class()
+    obj2.pk = pk
+    repo.update(obj2)
+    assert repo.get(pk) == obj
+    repo.delete(pk)
+    assert repo.get(pk) is None
 
 @pytest.mark.parametrize("repo,custom_class", [(MemoryRepository(), Custom)])
 def test_cannot_add_with_pk(repo, custom_class):

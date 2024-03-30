@@ -35,6 +35,7 @@ class SqliteRepository(AbstractRepository[T]):
             with sqlite3.connect(self._db_file) as con:
                 cur = con.cursor()
                 cur.execute(f"CREATE TABLE {self._table_name}({names})")
+            con.close()
         else:
             _logger.info(f"Database at {self._db_file} already exists.")
 
@@ -63,21 +64,26 @@ class SqliteRepository(AbstractRepository[T]):
             cur = con.cursor()
             cur.execute(f"SELECT * FROM {self._table_name} WHERE rowid = {pk}")
             data = cur.fetchone()
-        con.close()
+        if data is None:
+            return None
         obj = self._cls(*data, pk)
+        con.close()
         return obj  # type: ignore
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         return []
 
     def update(self, obj: T) -> None:
-        pass
-        # fields_stringified = ", ".join(
-        #     [f"{field}={getattr(obj, field)}" for field in self._fields]
-        # )
-        # with sqlite3.connect(self._db_file) as con:
-        #     cur = con.cursor()
-        #     cur.execute(f"UPDATE {self._table_name} SET")
+        fields_stringified = ", ".join(
+            [f"{field} = {getattr(obj, field)}" for field in self._fields]
+        )
+        with sqlite3.connect(self._db_file) as con:
+            cur = con.cursor()
+            cur.execute(f"UPDATE {self._table_name} SET {fields_stringified} WHERE rowid = {obj.pk}")
+        con.close()
 
     def delete(self, pk: int) -> None:
-        pass
+        with sqlite3.connect(self._db_file) as con:
+            cur = con.cursor()
+            cur.execute(f"DELETE FROM {self._table_name} WHERE rowid = {pk}")
+        con.close()
