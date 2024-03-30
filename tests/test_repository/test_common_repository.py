@@ -35,7 +35,7 @@ def test_cannot_add_with_pk(repo, custom_class):
         repo.add(obj)
 
 @pytest.mark.parametrize("repo,custom_class", [(MemoryRepository(), custom_class),
-                                               (SqliteRepository(), custom_class)])s
+                                               (SqliteRepository(), custom_class)])
 def test_cannot_add_without_pk(repo):
     with pytest.raises(ValueError):
         repo.add(0)
