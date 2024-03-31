@@ -39,10 +39,21 @@ class SqliteRepository(AbstractRepository[T]):
         else:
             _logger.info(f"Database at {self._db_file} already exists.")
 
+    def clear(self) -> None:
+        with sqlite3.connect(self._db_file) as con:
+            cur = con.cursor()
+            cur.execute(f"DELETE FROM {self._table_name}")
+        con.close()
+
     def add(self, obj: T) -> int:
         if not isinstance(obj, self._cls):
             raise ValueError(
                 f"Passing object of type {obj.__class__} instead of {self._cls}"
+            )
+
+        if getattr(obj, "pk", None) != 0:
+            raise ValueError(
+                f"Trying to add object {obj} with filled `pk` attribute"
             )
 
         fields = ", ".join("?" * len(self._fields.keys()))
@@ -71,9 +82,28 @@ class SqliteRepository(AbstractRepository[T]):
         return obj  # type: ignore
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
-        return []
+        with sqlite3.connect(self._db_file) as con:
+            cur = con.cursor()
+            if where is None:
+                cur.execute(f"SELECT *, ROWID FROM {self._table_name}")
+            else:
+                select_constraints = ", ".join(
+                    [f"{key}={value}" for key, value in where.items()]
+                )
+                cur.execute(
+                    f"SELECT *, ROWID FROM {self._table_name} "
+                    f"WHERE {select_constraints}"
+                )
+            entries = cur.fetchall()
+        con.close()
+        return [self._cls(*data) for data in entries]
 
     def update(self, obj: T) -> None:
+        if obj.pk == 0:
+            raise ValueError(
+                "Trying to update object with unknown primary key."
+            )
+
         fields_stringified = ", ".join(
             [f"{field} = {getattr(obj, field)}" for field in self._fields]
         )
@@ -88,5 +118,9 @@ class SqliteRepository(AbstractRepository[T]):
     def delete(self, pk: int) -> None:
         with sqlite3.connect(self._db_file) as con:
             cur = con.cursor()
-            cur.execute(f"DELETE FROM {self._table_name} WHERE rowid = {pk}")
+            res = cur.execute(
+                f"DELETE FROM {self._table_name} WHERE rowid = {pk}"
+            )
         con.close()
+        if res.rowcount == 0:
+            raise KeyError(f"Key {pk} not found in database.")

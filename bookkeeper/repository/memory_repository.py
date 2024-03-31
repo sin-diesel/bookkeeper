@@ -17,6 +17,10 @@ class MemoryRepository(AbstractRepository[T]):
         self._container: dict[int, T] = {}
         self._counter = count(1)
 
+    def clear(self) -> None:
+        self._container.clear()
+        self._counter = count(1)
+
     def add(self, obj: T) -> int:
         if getattr(obj, "pk", None) != 0:
             raise ValueError(
