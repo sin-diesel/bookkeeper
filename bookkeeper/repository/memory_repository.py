@@ -17,6 +17,10 @@ class MemoryRepository(AbstractRepository[T]):
         self._container: dict[int, T] = {}
         self._counter = count(1)
 
+    def clear(self) -> None:
+        self._container.clear()
+        self._counter = count(1)
+
     def add(self, obj: T) -> int:
         if getattr(obj, "pk", None) != 0:
             raise ValueError(
@@ -33,6 +37,11 @@ class MemoryRepository(AbstractRepository[T]):
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         if where is None:
             return list(self._container.values())
+        # for obj in self._container.values():
+        #     for attr, value in where.items():
+        #         import code; code.interact(local={**locals(), **globals()})
+        #         if all(getattr(obj, attr) == value):
+        #             return obj
         return [
             obj
             for obj in self._container.values()
