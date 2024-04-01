@@ -76,5 +76,5 @@ def test_get_all_with_condition(repo, custom_class):
         o.value = i
         repo.add(o)
         objects.append(o)
-    assert repo.get_all({'value': '0'}) == [objects[0]]
-    # assert repo.get_all({'value': '4'}) == [objects[-1]]
+    assert repo.get_all({'value': 0}) == [objects[0]]
+    assert repo.get_all({'value': 4}) == [objects[-1]]
