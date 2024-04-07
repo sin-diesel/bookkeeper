@@ -5,7 +5,7 @@
 from PySide6 import QtWidgets  # type: ignore
 
 
-class Window(QtWidgets.QMainWindow):  # type: ignore
+class Window(QtWidgets.QWidget):  # type: ignore
     def __init__(
         self, title: str, size_x: int = 800, size_y: int = 600
     ) -> None:
@@ -14,20 +14,19 @@ class Window(QtWidgets.QMainWindow):  # type: ignore
         self.resize(size_x, size_y)
 
 
-class ExpensesTable(QtWidgets.QTableWidget):  # type: ignore
-    def __init__(self, nrows: int, headers: list[str]) -> None:
+class Table(QtWidgets.QTableWidget):  # type: ignore
+    def __init__(
+        self,
+        nrows: int,
+        header_types: dict[str, QtWidgets.QHeaderView.ResizeMode],
+    ) -> None:
         super().__init__()
-        ncols = len(headers)
+        ncols = len(header_types)
         self.setColumnCount(ncols)
         self.setRowCount(nrows)
-        self.setHorizontalHeaderLabels(headers)
-        header = self.horizontalHeader()
-        for col_idx in range(ncols - 1):
-            header.setSectionResizeMode(
-                col_idx, QtWidgets.QHeaderView.ResizeToContents
-            )
-        header.setSectionResizeMode(
-            ncols - 1, QtWidgets.QHeaderView.Stretch
-        )
+        self.setHorizontalHeaderLabels(header_types.keys())
+        headers = self.horizontalHeader()
+        for idx, resize_type in enumerate(header_types.values()):
+            headers.setSectionResizeMode(idx, resize_type)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.verticalHeader().hide()
