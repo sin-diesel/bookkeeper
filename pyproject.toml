@@ -23,6 +23,10 @@ flake8 = "^6.0.0"
 mccabe = "^0.7.0"
 black = "^24.3.0"
 
+[tool.pylint]
+disable = "c-extension-no-member"
+fail-under = 9
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
