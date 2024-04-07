@@ -30,3 +30,21 @@ class Table(QtWidgets.QTableWidget):  # type: ignore
             headers.setSectionResizeMode(idx, resize_type)
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.verticalHeader().hide()
+
+
+class LabeledInput(QtWidgets.QWidget):
+    def __init__(self, text: str, init: str = "", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.layout = QtWidgets.QHBoxLayout()
+        self.label = QtWidgets.QLabel(text)
+        self.input = QtWidgets.QLineEdit(init)
+        self.layout.addWidget(self.label)
+        self.layout.addWidget(self.input)
+        self.setLayout(self.layout)
+
+    def text(self):
+        return self.input.text()
+
+class ComboBox(QtWidgets.QComboBox):
+    def __init__(self) -> None:
+        super().__init__()

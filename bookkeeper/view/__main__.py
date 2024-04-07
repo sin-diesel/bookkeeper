@@ -1,8 +1,11 @@
 import sys
 from PySide6 import QtWidgets  # type: ignore
+from PySide6.QtCore import QSize # type: ignore
 
 from .view import Window
 from .view import Table
+from .view import LabeledInput
+from .view import ComboBox
 
 
 def _main() -> None:
@@ -33,10 +36,25 @@ def _main() -> None:
     budget_table.setItem(1, 0, QtWidgets.QTableWidgetItem("Неделя"))
     budget_table.setItem(2, 0, QtWidgets.QTableWidgetItem("Месяц"))
 
+    sum = LabeledInput("Сумма")
+
+    category_layout = QtWidgets.QHBoxLayout()
+    categories = ComboBox()
+    categories.addItem("Продукты")
+    edit_button = QtWidgets.QPushButton("Редактировать")
+    category_layout.addWidget(categories)
+    category_layout.addWidget(edit_button)
+    add_button = QtWidgets.QPushButton("Добавить")
+
     layout.addWidget(QtWidgets.QLabel("Последние расходы"))
     layout.addWidget(expences_table)
     layout.addWidget(QtWidgets.QLabel("Бюджет"))
     layout.addWidget(budget_table)
+    layout.addWidget(sum)
+
+    layout.addLayout(category_layout)
+
+    layout.addWidget(add_button)
 
     window.setLayout(layout)
     window.show()
