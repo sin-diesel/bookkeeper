@@ -4,7 +4,8 @@
 
 import sys
 from PySide6 import QtWidgets  # type: ignore
-from ..bookkeeper import AbstractView
+from bookkeeper.bookkeeper import AbstractView
+from bookkeeper.models.category import Category
 
 
 class Window(QtWidgets.QWidget):  # type: ignore
@@ -65,6 +66,11 @@ class LabeledInput(QtWidgets.QWidget):  # type: ignore
 
 
 class View(AbstractView):
+    """
+    Класс задает способ отображения виджетов и их изменению,
+    при этом принимает данные от Presenter-а.
+    """
+
     def __init__(self) -> None:
         self._window = Window("The bookkeeper app")
 
@@ -96,7 +102,6 @@ class View(AbstractView):
 
         category_layout = QtWidgets.QHBoxLayout()
         self._categories = QtWidgets.QComboBox()
-        self._categories.addItem("Продукты")
         self._edit_button = QtWidgets.QPushButton("Редактировать")
         category_layout.addWidget(self._categories)
         category_layout.addWidget(self._edit_button)
@@ -114,11 +119,24 @@ class View(AbstractView):
 
         self._window.setLayout(layout)
 
+    def set_category_list(self, categories: list[Category]) -> None:
+        """
+        Отображает список категорий в QT GUI.
+        """
+        self._categories.addItems(categories)
+
     def show(self) -> None:
+        """
+        Отображает окно с приложением.
+        """
         self._window.show()
 
     def exec(self) -> None:
+        """
+        Запускает приложение.
+        """
         app = QtWidgets.QApplication(sys.argv)
+        self.show()
         sys.exit(app.exec())
 
     # def register_cat_adder(self, handler):

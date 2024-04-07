@@ -4,13 +4,19 @@
 """
 
 from typing import Protocol
-from typing import Callable
-from models.category import Category
-from repository.abstract_repository import AbstractRepository
+from bookkeeper.models.category import Category
+from bookkeeper.repository.abstract_repository import AbstractRepository
 
 
 class AbstractView(Protocol):
+    """
+    Абстрактный класс для GUI.
+    """
+
     def set_category_list(self, categories: list[Category]) -> None:
+        """
+        Отображает список категорий в GUI.
+        """
         pass
 
     # def register_cat_modifier(handler: Callable[[Category], None]):
@@ -18,7 +24,13 @@ class AbstractView(Protocol):
 
 
 class Bookkeeper:
-    def __init__(self, view: AbstractView, repository: AbstractRepository):
+    """
+    Presenter класс, занимается передачей данных View.
+    """
+
+    def __init__(
+        self, view: AbstractView, repository: AbstractRepository[Category]
+    ):
         self.view = view
         self.category_repository = repository
         self.cats = self.category_repository.get_all()

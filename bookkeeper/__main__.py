@@ -2,14 +2,12 @@
 Драйвер для программы.
 """
 
-from .bookkeeper import Bookkeeper
-from view.view import View
-from repository.memory_repository import MemoryRepository
+from bookkeeper.models.category import Category
+from bookkeeper.bookkeeper import Bookkeeper
+from bookkeeper.view.view import View
+from bookkeeper.repository.memory_repository import MemoryRepository
 
 view = View()
-memory_repo = MemoryRepository()
-import code
-
-code.interact(local={**locals(), **globals()})
+memory_repo: MemoryRepository[Category] = MemoryRepository()
 bookkeeper = Bookkeeper(view, memory_repo)
 view.exec()
