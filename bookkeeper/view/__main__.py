@@ -1,11 +1,9 @@
 import sys
 from PySide6 import QtWidgets  # type: ignore
-from PySide6.QtCore import QSize # type: ignore
 
 from .view import Window
 from .view import Table
 from .view import LabeledInput
-from .view import ComboBox
 
 
 def _main() -> None:
@@ -39,7 +37,7 @@ def _main() -> None:
     sum = LabeledInput("Сумма")
 
     category_layout = QtWidgets.QHBoxLayout()
-    categories = ComboBox()
+    categories = QtWidgets.QComboBox()
     categories.addItem("Продукты")
     edit_button = QtWidgets.QPushButton("Редактировать")
     category_layout.addWidget(categories)

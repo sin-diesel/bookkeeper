@@ -40,10 +40,10 @@ jobs:
         fi
     - name: Lint with pylint
       run: |
-        poetry run pylint --fail-under=9 $PROJECT_NAME
+        poetry run pylint $PROJECT_NAME
     - name: Lint with mypy
       run: |
-        poetry run mypy --strict $PROJECT_NAME
+        poetry run mypy --strict --no-site-packages $PROJECT_NAME
     - name: Lint with flake8
       run: |
         poetry run flake8 $PROJECT_NAME

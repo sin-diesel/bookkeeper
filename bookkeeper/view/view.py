@@ -6,6 +6,10 @@ from PySide6 import QtWidgets  # type: ignore
 
 
 class Window(QtWidgets.QWidget):  # type: ignore
+    """
+    Наследник класса QMainWindow с дополненным конструктором.
+    """
+
     def __init__(
         self, title: str, size_x: int = 800, size_y: int = 600
     ) -> None:
@@ -15,6 +19,11 @@ class Window(QtWidgets.QWidget):  # type: ignore
 
 
 class Table(QtWidgets.QTableWidget):  # type: ignore
+    """
+    Наследник класса QTableWidget, в конструкторе дополнительно настраивает
+    заголовки и их размер.
+    """
+
     def __init__(
         self,
         nrows: int,
@@ -32,9 +41,13 @@ class Table(QtWidgets.QTableWidget):  # type: ignore
         self.verticalHeader().hide()
 
 
-class LabeledInput(QtWidgets.QWidget):
-    def __init__(self, text: str, init: str = "", *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class LabeledInput(QtWidgets.QWidget):  # type: ignore
+    """
+    Реализация окна с вводом.
+    """
+
+    def __init__(self, text: str, init: str = ""):
+        super().__init__()
         self.layout = QtWidgets.QHBoxLayout()
         self.label = QtWidgets.QLabel(text)
         self.input = QtWidgets.QLineEdit(init)
@@ -43,8 +56,7 @@ class LabeledInput(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
     def text(self):
+        """
+        Возвращает текст, на данный момент находящиейся в окне.
+        """
         return self.input.text()
-
-class ComboBox(QtWidgets.QComboBox):
-    def __init__(self) -> None:
-        super().__init__()
