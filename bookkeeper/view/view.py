@@ -22,9 +22,12 @@ class ExpensesTable(QtWidgets.QTableWidget):  # type: ignore
         self.setRowCount(nrows)
         self.setHorizontalHeaderLabels(headers)
         header = self.horizontalHeader()
-        for col_idx in range(ncols):
+        for col_idx in range(ncols - 1):
             header.setSectionResizeMode(
                 col_idx, QtWidgets.QHeaderView.ResizeToContents
             )
+        header.setSectionResizeMode(
+            ncols - 1, QtWidgets.QHeaderView.Stretch
+        )
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.verticalHeader().hide()
