@@ -75,9 +75,9 @@ class View(AbstractView):
     def __init__(self) -> None:
         self._app = QtWidgets.QApplication(sys.argv)
         self._window = Window("The bookkeeper app")
+        self._category_window = Window("Список категорий", 300, 300)
 
         layout = QtWidgets.QVBoxLayout()
-        self._window.setLayout(layout)
 
         self._expenses_table = Table(
             20,
@@ -134,15 +134,14 @@ class View(AbstractView):
             self._categories_widget.addItem(category.name)
 
     def edit_categories(self) -> None:
-        category_window = Window(300, 300)
         layout = QtWidgets.QVBoxLayout()
         categories_table = Table(len(self._categories),
-                                 {"Категория", QtWidgets.QHeaderView.ResizeToContents})
-        layout.addWidget(categories_table)
+                                 {"Категория": QtWidgets.QHeaderView.ResizeToContents})
         for idx, category in enumerate(self._categories):
-            categories_table.setItem(idx, 0, (0, 0, QtWidgets.QTableWidgetItem(category.name)))
-        category_window.setLayout(layout)
-        category_window.show()
+            categories_table.setItem(idx, 0, QtWidgets.QTableWidgetItem(category.name))
+        layout.addWidget(categories_table)
+        self._category_window.setLayout(layout)
+        self._category_window.show()
 
     def show(self) -> None:
         """
