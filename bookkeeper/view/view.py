@@ -55,8 +55,8 @@ class LabeledInput(QtWidgets.QWidget):  # type: ignore
         self.layout.addWidget(self.input)
         self.setLayout(self.layout)
 
-    def text(self):
+    def text(self) -> str:
         """
         Возвращает текст, на данный момент находящиейся в окне.
         """
-        return self.input.text()
+        return self.input.text()  # type: ignore
