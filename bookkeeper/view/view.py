@@ -72,6 +72,7 @@ class View(AbstractView):
     """
 
     def __init__(self) -> None:
+        self._app = QtWidgets.QApplication(sys.argv)
         self._window = Window("The bookkeeper app")
 
         layout = QtWidgets.QVBoxLayout()
@@ -123,7 +124,8 @@ class View(AbstractView):
         """
         Отображает список категорий в QT GUI.
         """
-        self._categories.addItems(categories)
+        for category in categories:
+            self._categories.addItem(category.name)
 
     def show(self) -> None:
         """
@@ -135,9 +137,8 @@ class View(AbstractView):
         """
         Запускает приложение.
         """
-        app = QtWidgets.QApplication(sys.argv)
         self.show()
-        sys.exit(app.exec())
+        sys.exit(self._app.exec())
 
     # def register_cat_adder(self, handler):
     #     self.cat_adder = handler

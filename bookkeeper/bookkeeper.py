@@ -34,6 +34,7 @@ class Bookkeeper:
         self.view = view
         self.category_repository = repository
         self.cats = self.category_repository.get_all()
+        import code; code.interact(local={**locals(), **globals()})
         self.view.set_category_list(self.cats)
         # self.view.register_cat_modifier(self.modify_cat)
 
