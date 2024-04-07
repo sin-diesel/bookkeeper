@@ -4,6 +4,7 @@
 
 import sys
 from PySide6 import QtWidgets  # type: ignore
+from typing import Callable
 from bookkeeper.bookkeeper import AbstractView
 from bookkeeper.models.category import Category
 
@@ -102,9 +103,13 @@ class View(AbstractView):
         self._sum = LabeledInput("Сумма")
 
         category_layout = QtWidgets.QHBoxLayout()
-        self._categories = QtWidgets.QComboBox()
+        self._categories_widget = QtWidgets.QComboBox()
+
+        layout = QtWidgets.QVBoxLayout()
         self._edit_button = QtWidgets.QPushButton("Редактировать")
-        category_layout.addWidget(self._categories)
+        self._edit_button.clicked.connect(self.edit_categories)
+
+        category_layout.addWidget(self._categories_widget)
         category_layout.addWidget(self._edit_button)
         self._add_button = QtWidgets.QPushButton("Добавить")
 
@@ -124,8 +129,20 @@ class View(AbstractView):
         """
         Отображает список категорий в QT GUI.
         """
-        for category in categories:
-            self._categories.addItem(category.name)
+        self._categories = categories
+        for category in self._categories:
+            self._categories_widget.addItem(category.name)
+
+    def edit_categories(self) -> None:
+        category_window = Window(300, 300)
+        layout = QtWidgets.QVBoxLayout()
+        categories_table = Table(len(self._categories),
+                                 {"Категория", QtWidgets.QHeaderView.ResizeToContents})
+        layout.addWidget(categories_table)
+        for idx, category in enumerate(self._categories):
+            categories_table.setItem(idx, 0, (0, 0, QtWidgets.QTableWidgetItem(category.name)))
+        category_window.setLayout(layout)
+        category_window.show()
 
     def show(self) -> None:
         """
@@ -140,16 +157,16 @@ class View(AbstractView):
         self.show()
         sys.exit(self._app.exec())
 
-    # def register_cat_adder(self, handler):
-    #     self.cat_adder = handler
+    def register_cat_adder(self, handler: Callable[[object, Category], None]):
+        self._cat_adder = handler
 
-    # def add_category(self):
-    #     name = ""
-    #     parent = ""
-    #     try:
-    #         self.cat_adder(name, parent)
-    #     except RuntimeError as ex:
-    #         QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
+    def add_category(self):
+        name = ""
+        parent = ""
+        try:
+            self.cat_adder(name, parent)
+        except RuntimeError as ex:
+            QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
 
     # def delete_category(self):
     #     cat = ... # определить выбранную категорию

@@ -34,17 +34,16 @@ class Bookkeeper:
         self.view = view
         self.category_repository = repository
         self.cats = self.category_repository.get_all()
-        import code; code.interact(local={**locals(), **globals()})
         self.view.set_category_list(self.cats)
-        # self.view.register_cat_modifier(self.modify_cat)
+        self.view.register_cat_adder(self.modify_cat)
 
-    # def modify_cat(self, cat: Category) -> None:
-    #     self.category_repository.update(cat)
-    #     self.view.set_category_list(self.cats)
+    def modify_cat(self, cat: Category) -> None:
+        self.category_repository.update(cat)
+        self.view.set_category_list(self.cats)
 
-    # def add_category(self, name, parent):
-    #     if name in [c.name for c in self.cats]:
-    #         raise RuntimeError(f"Категория {name} уже существует")
+    def add_category(self, name: str, parent: int | None = None):
+        if name in [c.name for c in self.cats]:
+            raise RuntimeError(f"Категория {name} уже существует.")
 
     #     cat = Category(name, parent)
     #     self.category_repository.add(cat)
