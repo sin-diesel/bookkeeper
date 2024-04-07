@@ -13,7 +13,7 @@ keywords = ["bookkeeper", "python"]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
 pytest-cov = "^4.0.0"
-
+pyside6 = "^6.6.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
@@ -22,6 +22,10 @@ pylint = "^2.15.10"
 flake8 = "^6.0.0"
 mccabe = "^0.7.0"
 black = "^24.3.0"
+
+[tool.pylint]
+disable = "c-extension-no-member"
+fail-under = 9
 
 [build-system]
 requires = ["poetry-core"]
