@@ -1,0 +1,4 @@
+Запуск приложения:
+
+poetry shell
+python3 -m bookkeeper
