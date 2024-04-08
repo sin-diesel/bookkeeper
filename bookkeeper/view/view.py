@@ -76,6 +76,7 @@ class View(AbstractView):
         self._app = QtWidgets.QApplication(sys.argv)
         self._window = Window("The bookkeeper app")
         self._category_window = Window("Список категорий", 500, 500)
+        self._categories = []
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -96,6 +97,10 @@ class View(AbstractView):
                 "Бюджет": QtWidgets.QHeaderView.Stretch,
             },
         )
+        
+        self._categories_table = Table(20,
+                                 {"Категория": QtWidgets.QHeaderView.ResizeToContents})
+
         self._budget_table.setItem(0, 0, QtWidgets.QTableWidgetItem("День"))
         self._budget_table.setItem(1, 0, QtWidgets.QTableWidgetItem("Неделя"))
         self._budget_table.setItem(2, 0, QtWidgets.QTableWidgetItem("Месяц"))
@@ -123,24 +128,8 @@ class View(AbstractView):
 
         layout.addWidget(self._add_button)
 
-        self._window.setLayout(layout)
-
-    def set_category_list(self, categories: list[Category]) -> None:
-        """
-        Отображает список категорий в QT GUI.
-        """
-        self._categories = categories
-        for category in self._categories:
-            self._categories_widget.addItem(category.name)
-
-    def edit_categories(self) -> None:
-        layout = QtWidgets.QVBoxLayout()
-        categories_table = Table(len(self._categories),
-                                 {"Категория": QtWidgets.QHeaderView.ResizeToContents})
-        for idx, category in enumerate(self._categories):
-            categories_table.setItem(idx, 0, QtWidgets.QTableWidgetItem(category.name))
-
-        add_delete_layout = QtWidgets.QHBoxLayout()
+        self._cat_layout = QtWidgets.QVBoxLayout()
+        self._add_delete_layout = QtWidgets.QHBoxLayout()
         self._category_name_input = LabeledInput("Название категории")
 
         self._add_button = QtWidgets.QPushButton("Добавить")
@@ -148,13 +137,29 @@ class View(AbstractView):
 
         self._delete_button = QtWidgets.QPushButton("Удалить")
 
-        add_delete_layout.addWidget(self._category_name_input)
-        add_delete_layout.addWidget(self._add_button)
-        add_delete_layout.addWidget(self._delete_button)
+        self._add_delete_layout.addWidget(self._category_name_input)
+        self._add_delete_layout.addWidget(self._add_button)
+        self._add_delete_layout.addWidget(self._delete_button)
 
-        layout.addWidget(categories_table)
-        layout.addLayout(add_delete_layout)
-        self._category_window.setLayout(layout)
+        self._cat_layout.addWidget(self._categories_table)
+        self._cat_layout.addLayout(self._add_delete_layout)
+        self._category_window.setLayout(self._cat_layout)
+
+        self._window.setLayout(layout)
+
+    def set_category_list(self, categories: list[Category]) -> None:
+        """
+        Отображает список категорий в QT GUI.
+        """
+        self._categories = categories
+        self._categories_widget.clear()
+        for category in self._categories:
+            self._categories_widget.addItem(category.name)
+
+        for idx, category in enumerate(self._categories):
+             self._categories_table.setItem(idx, 0, QtWidgets.QTableWidgetItem(category.name))
+
+    def edit_categories(self) -> None:
         self._category_window.show()
 
     def show(self) -> None:
