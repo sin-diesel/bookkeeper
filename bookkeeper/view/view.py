@@ -75,7 +75,7 @@ class View(AbstractView):
     def __init__(self) -> None:
         self._app = QtWidgets.QApplication(sys.argv)
         self._window = Window("The bookkeeper app")
-        self._category_window = Window("Список категорий", 300, 300)
+        self._category_window = Window("Список категорий", 500, 500)
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -139,7 +139,21 @@ class View(AbstractView):
                                  {"Категория": QtWidgets.QHeaderView.ResizeToContents})
         for idx, category in enumerate(self._categories):
             categories_table.setItem(idx, 0, QtWidgets.QTableWidgetItem(category.name))
+
+        add_delete_layout = QtWidgets.QHBoxLayout()
+        self._category_name_input = LabeledInput("Название категории")
+
+        self._add_button = QtWidgets.QPushButton("Добавить")
+        self._add_button.clicked.connect(self.add_category)
+
+        self._delete_button = QtWidgets.QPushButton("Удалить")
+
+        add_delete_layout.addWidget(self._category_name_input)
+        add_delete_layout.addWidget(self._add_button)
+        add_delete_layout.addWidget(self._delete_button)
+
         layout.addWidget(categories_table)
+        layout.addLayout(add_delete_layout)
         self._category_window.setLayout(layout)
         self._category_window.show()
 
@@ -160,12 +174,11 @@ class View(AbstractView):
         self._cat_adder = handler
 
     def add_category(self):
-        name = ""
-        parent = ""
+        name = self._category_name_input.text()
         try:
-            self.cat_adder(name, parent)
+            self._cat_adder(name)
         except RuntimeError as ex:
-            QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
+            QtWidgets.QMessageBox.critical(self._category_window, "Ошибка", str(ex))
 
     # def delete_category(self):
     #     cat = ... # определить выбранную категорию
